@@ -2,7 +2,6 @@ import cv2 as cv
 import os
 import numpy as np
 
-# Φάκελοι με τις εικόνες
 train_folders = [
     'images/caltech-101_5_train/accordion',
     'images/caltech-101_5_train/electric_guitar',
@@ -11,11 +10,9 @@ train_folders = [
     'images/caltech-101_5_train/metronome'
 ]
 
-# Μεγέθη λεξικού
 vocabulary_sizes = [20, 50, 100, 150, 200]
-k_values = [1, 3, 5, 7, 9]  # Διαφορετικές τιμές του k
+k_values = [1, 3, 5, 7, 9]
 
-# Αρχικοποίηση SIFT
 sift = cv.xfeatures2d_SIFT.create()
 
 def extract_local_features(path):

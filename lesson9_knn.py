@@ -1,7 +1,6 @@
 import cv2 as cv
 import numpy as np
 
-# Φάκελοι εκπαίδευσης
 train_folders = [
     'images/caltech-101_5_train/accordion',
     'images/caltech-101_5_train/electric_guitar',
@@ -10,13 +9,10 @@ train_folders = [
     'images/caltech-101_5_train/metronome'
 ]
 
-# Μεγέθη λεξικού
 vocabulary_sizes = [20, 50, 100, 150, 200]
 
-# Τιμές του k
 k_values = [1, 3, 5, 7, 9]
 
-# Κατηγορίες και ετικέτες
 category_labels = {
     'accordion': 0,
     'electric_guitar': 1,
@@ -25,7 +21,6 @@ category_labels = {
     'metronome': 4
 }
 
-# Αρχικοποίηση SIFT
 sift = cv.xfeatures2d_SIFT.create()
 
 for size in vocabulary_sizes:
@@ -34,12 +29,11 @@ for size in vocabulary_sizes:
     for k in k_values:
         print(f'Testing with k={k} for vocabulary size {size}...')
 
-        # Φόρτωση ευρετηρίου και λεξικού
         bow_descs = np.load(f'index/train/train_index_{size}_k{k}.npy').astype(np.float32)
         img_paths = np.load(f'paths/train/train_paths_{size}_k{k}.npy', allow_pickle=True)
         vocabulary = np.load(f'vocabulary_{size}.npy')
 
-        # Εκπαίδευση k-NN
+        # k-NN train
         labels = []
         for p in img_paths:
             for category, label in category_labels.items():
@@ -51,12 +45,12 @@ for size in vocabulary_sizes:
         knn = cv.ml.KNearest_create()
         knn.train(bow_descs, cv.ml.ROW_SAMPLE, labels)
 
-        # Εξαγωγέας περιγραφών BOVW
+        # BOVW
         descriptor_extractor = cv.BOWImgDescriptorExtractor(sift, cv.BFMatcher(cv.NORM_L2))
         descriptor_extractor.setVocabulary(vocabulary)
 
-        # Δοκιμή
-        test_img = "images/caltech-101_5_test/grand_piano/image_0080.jpg"  # Αλλαγή της εικόνας για δοκιμές
+        # test
+        test_img = "images/caltech-101_5_test/grand_piano/image_0080.jpg"
         img = cv.imread(test_img)
         kp = sift.detect(img)
         bow_desc = descriptor_extractor.compute(img, kp)
@@ -65,10 +59,10 @@ for size in vocabulary_sizes:
             print(f'No features detected in test image for vocabulary size {size} and k={k}. Skipping...')
             continue
 
-        # Αναζήτηση με k-NN
+        # k-NN
         response, results, neighbours, dist = knn.findNearest(bow_desc, k=k)
 
-        # Αποτέλεσμα
+        # results
         predicted_label = int(response)
         predicted_category = [k for k, v in category_labels.items() if v == predicted_label][0]
         print(f'Vocabulary size {size}, k={k}: It is a {predicted_category}')
