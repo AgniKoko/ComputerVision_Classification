@@ -64,13 +64,12 @@ for size in vocabulary_sizes:
             kp = sift.detect(img)
             bow_desc = descriptor_extractor.compute(img, kp)
 
-            if bow_desc is None:  # Έλεγχος για κενά descriptors
+            if bow_desc is None:
                 continue
 
             img_paths.append(path)
             bow_descs = np.concatenate((bow_descs, bow_desc), axis=0)
 
-    # Αποθήκευση ευρετηρίου και διαδρομών για κάθε k
     for k in k_values:
         np.save(f'index/train/train_index_{size}_k{k}.npy', bow_descs)
         np.save(f'paths/train/train_paths_{size}_k{k}.npy', img_paths)
