@@ -18,6 +18,9 @@ precision_results = []
 recall_results = []
 map_results = []
 
+accuracy_results = []
+error_results = []
+
 
 for size in vocabulary_sizes:
     print(f'Testing with vocabulary size {size}')
@@ -40,6 +43,9 @@ for size in vocabulary_sizes:
         test_labels.extend([label] * len(files))
     test_labels = np.array(test_labels)
 
+    total_predictions = 0
+    correct_predictions = 0
+
     correct = {label: 0 for label in category_labels.values()}
     retrieved = {label: 0 for label in category_labels.values()}
     relevant = {label: 0 for label in category_labels.values()}
@@ -56,17 +62,15 @@ for size in vocabulary_sizes:
         predicted_label = int(response[0][0])
 
         retrieved[predicted_label] += 1
+        total_predictions += 1
         if predicted_label == true_label:
             correct[predicted_label] += 1
-        relevant[true_label] += 1
+            relevant[true_label] += 1
+            correct_predictions += 1
 
-    # Precision Recall
-    precision = {label: correct[label] / retrieved[label] if retrieved[label] > 0 else 0 for label in
-                 category_labels.values()}
-    recall = {label: correct[label] / relevant[label] if relevant[label] > 0 else 0 for label in
-              category_labels.values()}
-
-    # Mean Average Precision (mAP)
+    # Performance
+    precision = {label: correct[label] / retrieved[label] if retrieved[label] > 0 else 0 for label in category_labels.values()}
+    recall = {label: correct[label] / relevant[label] if relevant[label] > 0 else 0 for label in category_labels.values()}
     map_value = sum(precision.values()) / len(category_labels)
 
     precision_results.append(np.mean(list(precision)))
@@ -75,7 +79,38 @@ for size in vocabulary_sizes:
 
     print(f'Vocabulary size {size}, Precision={precision_results[-1]:.2f}, Recall={recall_results[-1]:.2f}, mAP={map_results[-1]:.2f}')
 
+    # Calculate accuracy and errors
+    accuracy = correct_predictions / total_predictions if total_predictions > 0 else 0
+    errors = total_predictions - correct_predictions
 
+    accuracy_results.append(accuracy)
+    error_results.append(errors)
+
+    print(f'Vocabulary size {size}, Accuracy={accuracy:.2f}, Errors={errors}')
+
+
+# Plot results
+plt.figure()
+plt.plot(vocabulary_sizes, accuracy_results, marker='o', label='Accuracy')
+plt.title('Accuracy vs Vocabulary Size')
+plt.xlabel('Vocabulary Size')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.grid(True)
+plt.savefig('plots/accuracy_vs_vocabulary_size.png')
+plt.show()
+
+plt.figure()
+plt.plot(vocabulary_sizes, error_results, marker='s', label='Errors', color='darkorange')
+plt.title('Errors vs Vocabulary Size')
+plt.xlabel('Vocabulary Size')
+plt.ylabel('Number of Errors')
+plt.legend()
+plt.grid(True)
+plt.savefig('plots/errors_vs_vocabulary_size.png')
+plt.show()
+
+# Performance
 plt.figure()
 plt.plot(vocabulary_sizes, map_results, marker='^', label=f'mAP')
 plt.plot(vocabulary_sizes, precision_results, marker='o', label=f'Precision')
@@ -85,16 +120,6 @@ plt.ylabel('Μετρικές Απόδοσης')
 plt.legend()
 plt.grid(True)
 plt.savefig(f'plots/performance.png')
-plt.show()
-
-# Precision
-plt.figure()
-plt.plot(vocabulary_sizes, recall_results, marker='s', label=f'Recall')
-plt.title(f'Precision ανά μέγεθος λεξικού')
-plt.xlabel('Μέγεθος Λεξικού')
-plt.ylabel('Precision')
-plt.grid(True)
-plt.savefig(f'plots/precision.png')
 plt.show()
 
 
