@@ -44,7 +44,7 @@ for size in vocabulary_sizes:
 
         svm = cv.ml.SVM_create()
         svm.setType(cv.ml.SVM_C_SVC)
-        svm.setKernel(cv.ml.SVM_RBF)  # Χρήση RBF kernel
+        svm.setKernel(cv.ml.SVM_RBF)
         svm.setTermCriteria((cv.TERM_CRITERIA_COUNT, 100, 1.e-06))
 
         svm.trainAuto(bow_descs, cv.ml.ROW_SAMPLE, labels)
