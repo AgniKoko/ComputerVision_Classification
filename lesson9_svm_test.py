@@ -25,7 +25,7 @@ for size in vocabulary_sizes:
     # SVM
     vocabulary = np.load(f'vocabulary_{size}.npy')
     svm = cv.ml.SVM_create()
-    svm = svm.load(f'svm_models/svm_model_{size}_k1.xml')
+    svm = svm.load(f'svm_models/svm_model_{size}.xml')
 
     # BOVW
     descriptor_extractor = cv.BOWImgDescriptorExtractor(cv.xfeatures2d_SIFT.create(), cv.BFMatcher(cv.NORM_L2))

@@ -11,9 +11,6 @@ train_folders = [
 
 vocabulary_sizes = [20, 50, 100, 150, 200]
 
-# Τιμές του k
-k_values = [1, 3, 5, 7, 9]
-
 category_labels = {
     'accordion': 0,
     'electric_guitar': 1,
@@ -39,18 +36,18 @@ for size in vocabulary_sizes:
 
     labels = np.array(labels, np.int32)
 
-    for k in k_values:
-        print(f'Training SVM for vocabulary size {size} and k={k}...')
 
-        svm = cv.ml.SVM_create()
-        svm.setType(cv.ml.SVM_C_SVC)
-        svm.setKernel(cv.ml.SVM_RBF)
-        svm.setTermCriteria((cv.TERM_CRITERIA_COUNT, 100, 1.e-06))
+    print(f'Training SVM for vocabulary size {size}')
 
-        svm.trainAuto(bow_descs, cv.ml.ROW_SAMPLE, labels)
+    svm = cv.ml.SVM_create()
+    svm.setType(cv.ml.SVM_C_SVC)
+    svm.setKernel(cv.ml.SVM_RBF)
+    svm.setTermCriteria((cv.TERM_CRITERIA_COUNT, 100, 1.e-06))
 
-        svm_filename = f'svm_model/svm_model_{size}_k{k}.xml'
-        svm.save(svm_filename)
-        print(f'SVM model for vocabulary size {size} and k={k} saved as {svm_filename}.')
+    svm.trainAuto(bow_descs, cv.ml.ROW_SAMPLE, labels)
 
-print('SVM training completed for all vocabulary sizes and k values.')
+    svm_filename = f'svm_models/svm_model_{size}.xml'
+    svm.save(svm_filename)
+    print(f'SVM model for vocabulary size {size} saved as {svm_filename}.')
+
+print('SVM training completed for all vocabulary sizes.')
